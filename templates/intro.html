@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>✨ Disney Wish Oracle - Welcome ✨</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/intro.css') }}?v={{ cache_bust }}">
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One:wght@400&family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Intro Start Screen -->
+    <div id="introStartScreen" class="intro-start-screen">
+        <div class="magical-background">
+            <div class="stars"></div>
+            <div class="sparkles"></div>
+        </div>
+        
+        <div class="intro-content">
+            <h1 class="intro-title">✨ Disney Wish Oracle ✨</h1>
+            <h2 class="intro-subtitle">🎂 Rafa's Magical 30th Birthday Adventure 🎂</h2>
+            <p class="intro-description">Fort Wilderness • Where Dreams Come True</p>
+            
+            <div class="intro-features">
+                <div class="feature-item">🎁 30 Magical Gifts Await</div>
+                <div class="feature-item">🎡 Spin the Wheel of Wishes</div>
+                <div class="feature-item">🌟 Disney Characters Guide You</div>
+                <div class="feature-item">🏰 Birthday Magic Unlimited</div>
+            </div>
+            
+            <button id="startButton" class="start-button" onclick="startIntroVideo()">
+                🎬 BEGIN THE MAGIC! 🎬
+            </button>
+            
+            <p class="intro-note">Click to watch the magical introduction</p>
+        </div>
+    </div>
+
+    <!-- Full Screen Video Container -->
+    <div id="videoContainer" class="video-container hidden">
+        <video id="introVideo" class="intro-video" preload="auto">
+            <source src="{{ url_for('static', filename='assets/intro.mp4') }}" type="video/mp4">
+            Your browser does not support the video tag.
+        </video>
+        
+        <div class="video-controls">
+            <button id="skipButton" class="skip-button" onclick="skipVideo()">
+                ⏭️ Skip Introduction
+            </button>
+        </div>
+        
+        <div class="video-loading">
+            <div class="loading-spinner"></div>
+            <p>Loading magical introduction...</p>
+        </div>
+    </div>
+
+    <!-- Loading overlay for transition -->
+    <div id="transitionOverlay" class="transition-overlay hidden">
+        <div class="transition-content">
+            <div class="spinner"></div>
+            <h2>✨ Preparing Your Magical Adventure ✨</h2>
+            <p>Loading the Disney Wish Oracle...</p>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/intro.js') }}?v={{ cache_bust }}"></script>
+</body>
+</html> 

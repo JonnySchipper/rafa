@@ -1,0 +1,208 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="welcome-screen">
+    <!-- Progress Section -->
+    <div class="progress-section">
+        <div class="progress-card">
+            <h3 class="progress-title">✨ Magical Gifts Revealed: {{ summary.revealed_gifts }}/30 ✨</h3>
+            {% if summary.revealed_gifts > 0 %}
+                <p class="progress-percentage">🌟 Adventure Progress: {{ "%.1f"|format(summary.completion_percentage) }}% Complete 🌟</p>
+                
+                {% if summary.is_complete %}
+                    <p class="completion-message">🏆 ALL WISHES GRANTED! 🏆</p>
+                {% endif %}
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Gift Selection Grid -->
+    {% if summary.remaining_gifts > 0 %}
+        <div class="gift-selection-section">
+            <h2 class="selection-title">🎁 Choose Your Next Magical Gift! 🎁</h2>
+            <p class="selection-subtitle">Each gift has its own unique magical reveal experience!</p>
+            
+
+            
+            <div class="gifts-grid">
+                {% for gift in available_gifts %}
+                    <div class="gift-card {% if gift.id % 5 == 0 %}special-gift{% endif %}" data-gift-id="{{ gift.id }}" onclick="revealGift({{ gift.id }})">
+                        <div class="gift-icon">
+                            {% if gift.id % 5 == 0 %}
+                                <div class="special-present">🎁</div>
+                            {% else %}
+                                🎁
+                            {% endif %}
+                        </div>
+                                                        <div class="gift-reveal-type">
+                                    {% if gift.id % 5 == 0 %}
+                                        <span class="special-reveal">✨ Surprise Magic ✨</span>
+                                    {% else %}
+                                        <span class="magic-reveal">✨ Magical ✨</span>
+                                    {% endif %}
+                                </div>
+                    </div>
+                {% endfor %}
+            </div>
+            
+        </div>
+    {% else %}
+        <div class="completion-celebration">
+            <h2>🏆 ALL 30 MAGICAL GIFTS REVEALED! 🏆</h2>
+            <p>🎂 Rafa's 30th Birthday Adventure is Complete! 🎂</p>
+            <p>✨ Happy Birthday from all your Disney friends! ✨</p>
+            <p>🌟 May all your wishes come true! 🌟</p>
+        </div>
+    {% endif %}
+
+    <!-- Options Section -->
+    <div class="options-section">
+        <button class="option-btn" onclick="showProgressScreen()">📊 View Progress</button>
+        <button class="option-btn" onclick="showSettingsScreen()">⚙️ Settings</button>
+        
+        {% if summary.revealed_gifts > 0 %}
+            <button class="option-btn danger-btn" onclick="confirmReset()">🔄 Reset Game</button>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Hidden screens that will be shown via JavaScript -->
+<div id="revealScreen" class="screen hidden">
+    <div class="reveal-container">
+        <div class="reveal-animation-area" id="revealAnimationArea">
+            <!-- Dynamic reveal animations will be inserted here -->
+        </div>
+        
+        <div class="character-section">
+            <h3 id="characterName" class="character-name">🌟 Character Name 🌟</h3>
+            <div id="characterImage" class="character-image">
+                <div class="character-placeholder">✨ Character ✨</div>
+            </div>
+        </div>
+        
+        <div class="message-section">
+            <div class="message-bubble">
+                <h4 id="characterSpeaker">💬 Character says:</h4>
+                <p id="characterMessage" class="character-message">Loading magical message...</p>
+            </div>
+        </div>
+        
+        <div class="gift-section">
+            <h3 id="giftTitle" class="gift-title">🎁 GIFT #0 🎁</h3>
+            <div id="giftImage" class="gift-image">
+                <div class="gift-placeholder">🎁 Loading Gift 🎁</div>
+            </div>
+        </div>
+        
+        <div class="reveal-controls">
+            <button id="acceptGiftBtn" class="accept-btn" onclick="acceptGift()">🎉 ACCEPT THIS MAGICAL GIFT! 🎉</button>
+            <button class="back-btn" onclick="showHomeScreen()">⬅️ Back to Menu</button>
+        </div>
+    </div>
+</div>
+
+
+
+<div id="progressScreen" class="screen hidden">
+    <h2 class="screen-title">📊 Birthday Adventure Progress</h2>
+    
+    <div class="detailed-progress">
+        <div class="progress-stats">
+            <div class="stat-item">
+                <span class="stat-value">{{ summary.revealed_gifts }}</span>
+                <span class="stat-label">Gifts Revealed</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-value">{{ summary.remaining_gifts }}</span>
+                <span class="stat-label">Remaining</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-value">{{ "%.1f"|format(summary.completion_percentage) }}%</span>
+                <span class="stat-label">Complete</span>
+            </div>
+        </div>
+        
+        <div class="progress-bar-container">
+            <div class="progress-bar">
+                <div class="progress-fill" style="width: {{ summary.completion_percentage }}%"></div>
+            </div>
+        </div>
+        
+        <div class="revealed-gifts-grid">
+            <h3>🎁 Revealed Gifts:</h3>
+            <div class="revealed-list">
+                <!-- Will be populated by JavaScript -->
+            </div>
+        </div>
+    </div>
+    
+    <button class="back-btn" onclick="showHomeScreen()">⬅️ Back to Menu</button>
+</div>
+
+<div id="settingsScreen" class="screen hidden">
+    <h2 class="screen-title">⚙️ Oracle Settings</h2>
+    
+    <div class="settings-section">
+        <h3>🎮 Game Settings:</h3>
+        <div class="setting-info">
+            <p>✨ Each gift has a unique magical reveal experience</p>
+            <p>🎭 Special animated reveals for all gifts</p>
+            <p>🎂 Perfect for Rafa's 30th birthday celebration</p>
+        </div>
+    </div>
+    
+    <div class="settings-section">
+        <h3>🌟 Magic Status:</h3>
+        <p id="apiStatus" class="api-status">✅ Ready for Birthday Magic</p>
+    </div>
+    
+    <button class="back-btn" onclick="showHomeScreen()">⬅️ Back to Menu</button>
+</div>
+
+<!-- Loading overlay -->
+<div id="loadingOverlay" class="loading-overlay hidden">
+    <div class="loading-content">
+        <div class="spinner"></div>
+        <p id="loadingText">✨ Loading magical content... ✨</p>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Initialize with data from Flask
+window.gameData = {
+    summary: {{ summary | tojson | safe }},
+    availableGifts: {{ available_gifts | tojson | safe }},
+    session: {{ session_data | tojson | safe }}
+};
+
+// Define reveal methods for each gift
+window.revealMethods = {
+    1: "🎩 Magic Hat Reveal",
+    2: "⭐ Shooting Star",
+    3: "🧚‍♀️ Fairy Dust Sprinkle",
+    4: "🏰 Castle Door Opening",
+    6: "🔮 Crystal Ball Vision",
+    7: "🪄 Magic Wand Tap",
+    8: "🎆 Fireworks Explosion",
+    9: "❄️ Snow Globe Shake",
+    11: "📚 Enchanted Book",
+    12: "🪞 Magic Mirror",
+    13: "🧞‍♂️ Genie Lamp Rub",
+    14: "🌊 Ocean Wave Reveal",
+    16: "🦋 Butterfly Transformation",
+    17: "🌙 Moonbeam Shine",
+    18: "🎪 Circus Magic",
+    19: "🌈 Rainbow Bridge",
+    21: "🕯️ Candle Flame Dance",
+    22: "🎵 Musical Note Float",
+    23: "🌸 Flower Bloom",
+    24: "⚡ Lightning Strike",
+    26: "🌟 Constellation Form",
+    27: "🎭 Theater Curtain",
+    28: "🧙‍♂️ Wizard Spell",
+    29: "🎨 Paint Brush Magic"
+};
+</script>
+{% endblock %} 

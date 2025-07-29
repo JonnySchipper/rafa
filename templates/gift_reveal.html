@@ -1,0 +1,322 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="gift-reveal-page">
+    <div class="reveal-container">
+        <div class="reveal-header">
+            <h1 class="reveal-title">🎁 Magical Gift Revealed! 🎁</h1>
+            <p class="reveal-subtitle">Your special surprise awaits...</p>
+        </div>
+        
+        <div class="gift-media-container">
+            <div id="giftMediaArea" class="gift-media-area">
+                <!-- Media content will be inserted here by JavaScript -->
+                <div class="loading-spinner">
+                    <div class="spinner"></div>
+                    <p>✨ Revealing your magical gift... ✨</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="reveal-actions">
+            <button class="back-btn" onclick="goBackToGifts()">
+                ⬅️ Back to Gifts
+            </button>
+            <button class="mark-revealed-btn" onclick="markGiftRevealed()" style="display: none;">
+                ✅ Mark as Revealed
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+// Get gift ID from URL parameters
+const urlParams = new URLSearchParams(window.location.search);
+const giftId = urlParams.get('gift');
+
+// Load the gift media when page loads
+document.addEventListener('DOMContentLoaded', function() {
+    if (giftId) {
+        loadGiftMedia(giftId);
+    } else {
+        showError('No gift ID specified');
+    }
+});
+
+function loadGiftMedia(giftId) {
+    console.log('🎁 Loading gift media for gift:', giftId);
+    
+    const mediaArea = document.getElementById('giftMediaArea');
+    
+    // Use the correct paths based on the Flask routes
+    const videoUrl = `/static/images/${giftId}.mp4`;
+    const imageUrl = `/static/images/${giftId}.png`;
+    
+    console.log('📹 Trying video URL:', videoUrl);
+    console.log('🖼️ Fallback image URL:', imageUrl);
+    
+    // First, check if video exists using fetch
+    fetch(videoUrl, { method: 'HEAD' })
+        .then(response => {
+            if (response.ok) {
+                console.log('✅ Video found, loading:', videoUrl);
+                // Video exists, display it
+                mediaArea.innerHTML = `
+                    <video class="gift-video" controls autoplay muted>
+                        <source src="${videoUrl}" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                `;
+                document.querySelector('.mark-revealed-btn').style.display = 'inline-block';
+            } else {
+                console.log('❌ Video not found, trying image:', imageUrl);
+                tryLoadImage(giftId, imageUrl, mediaArea);
+            }
+        })
+        .catch(error => {
+            console.log('❌ Video fetch failed, trying image:', error);
+            tryLoadImage(giftId, imageUrl, mediaArea);
+        });
+}
+
+function tryLoadImage(giftId, imageUrl, mediaArea) {
+    // Check if image exists using fetch
+    fetch(imageUrl, { method: 'HEAD' })
+        .then(response => {
+            if (response.ok) {
+                console.log('✅ Image found, loading:', imageUrl);
+                // Image exists, display it
+                mediaArea.innerHTML = `
+                    <img class="gift-image" src="${imageUrl}" alt="Gift ${giftId}" onload="console.log('🖼️ Image loaded successfully')">
+                `;
+                document.querySelector('.mark-revealed-btn').style.display = 'inline-block';
+            } else {
+                console.log('❌ Image not found either');
+                showError(`Gift media not found for gift ${giftId}`);
+            }
+        })
+        .catch(error => {
+            console.log('❌ Image fetch failed:', error);
+            showError(`Gift media not found for gift ${giftId}`);
+        });
+}
+
+function showError(message) {
+    const mediaArea = document.getElementById('giftMediaArea');
+    mediaArea.innerHTML = `
+        <div class="error-message">
+            <h3>😔 Oops!</h3>
+            <p>${message}</p>
+            <p>The magical gift is still being prepared...</p>
+        </div>
+    `;
+}
+
+function goBackToGifts() {
+    window.location.href = '/main';
+}
+
+function markGiftRevealed() {
+    if (!giftId) return;
+    
+    // Call API to mark gift as revealed
+    fetch('/api/reveal_gift', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            gift_id: parseInt(giftId)
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Add this gift to processed reveals to prevent webhook polling from re-triggering it
+            if (window.processedReveals && data.gift && data.gift.revealed_at) {
+                const revealKey = `${giftId}-${data.gift.revealed_at}`;
+                window.processedReveals.add(revealKey);
+                console.log('✅ Gift marked as processed to prevent re-triggering:', revealKey);
+            }
+            
+            // Redirect without tacky popup
+            window.location.href = '/main';
+        } else {
+            console.error('Failed to mark gift as revealed:', data.message);
+            // Still redirect on failure to avoid being stuck
+            window.location.href = '/main';
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        // Still redirect on error to avoid being stuck
+        window.location.href = '/main';
+    });
+}
+</script>
+{% endblock %}
+
+{% block scripts %}
+<style>
+.gift-reveal-page {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+}
+
+.reveal-container {
+    max-width: 800px;
+    width: 100%;
+    text-align: center;
+    background: linear-gradient(135deg, rgba(30, 58, 138, 0.9), rgba(59, 130, 246, 0.7));
+    border: 3px solid #FFD700;
+    border-radius: 30px;
+    padding: 3rem;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(15px);
+}
+
+.reveal-title {
+    font-family: 'Fredoka One', cursive;
+    font-size: 3rem;
+    color: #FFD700;
+    margin-bottom: 1rem;
+    text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.5);
+    animation: titlePulse 2s ease-in-out infinite alternate;
+}
+
+@keyframes titlePulse {
+    0% { transform: scale(1); }
+    100% { transform: scale(1.05); }
+}
+
+.reveal-subtitle {
+    font-size: 1.5rem;
+    color: #87CEEB;
+    margin-bottom: 2rem;
+    font-style: italic;
+}
+
+.gift-media-area {
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 20px;
+    padding: 2rem;
+    margin: 2rem 0;
+    min-height: 400px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid rgba(255, 215, 0, 0.3);
+}
+
+.gift-video, .gift-image {
+    max-width: 100%;
+    max-height: 500px;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
+.loading-spinner {
+    text-align: center;
+    color: #FFD700;
+}
+
+.loading-spinner .spinner {
+    width: 60px;
+    height: 60px;
+    border: 6px solid rgba(255, 215, 0, 0.3);
+    border-top: 6px solid #FFD700;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 1rem;
+}
+
+.error-message {
+    color: #FF6B6B;
+    font-size: 1.2rem;
+}
+
+.error-message h3 {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+}
+
+.reveal-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    margin: 2rem 0;
+    flex-wrap: wrap;
+}
+
+.back-btn, .mark-revealed-btn {
+    padding: 1rem 2rem;
+    font-size: 1.2rem;
+    font-weight: bold;
+    border: none;
+    border-radius: 25px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    min-width: 200px;
+}
+
+.back-btn {
+    background: linear-gradient(135deg, #6B73FF, #9A8DFF);
+    color: white;
+    box-shadow: 0 8px 20px rgba(107, 115, 255, 0.4);
+}
+
+.back-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 25px rgba(107, 115, 255, 0.6);
+}
+
+.mark-revealed-btn {
+    background: linear-gradient(135deg, #32CD32, #98FB98);
+    color: white;
+    box-shadow: 0 8px 20px rgba(50, 205, 50, 0.4);
+}
+
+.mark-revealed-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 25px rgba(50, 205, 50, 0.6);
+}
+
+.reveal-info {
+    background: rgba(135, 206, 235, 0.2);
+    border: 1px solid rgba(135, 206, 235, 0.5);
+    border-radius: 15px;
+    padding: 1.5rem;
+    margin-top: 2rem;
+}
+
+.gift-description {
+    color: #87CEEB;
+    font-size: 1.1rem;
+    margin: 0;
+    font-style: italic;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .reveal-container {
+        padding: 2rem;
+    }
+    
+    .reveal-title {
+        font-size: 2rem;
+    }
+    
+    .reveal-actions {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .back-btn, .mark-revealed-btn {
+        min-width: 250px;
+    }
+}
+</style>
+{% endblock %} 

@@ -1,0 +1,107 @@
+[
+  {
+    "name": "Baymax",
+    "image_path": "assets/baymax.png",
+    "personality": "Caring healthcare companion robot from Big Hero 6",
+    "match_keywords": ["health", "baymax", "comfort", "tech", "care", "healing"],
+    "voice_style": "Gentle, caring, and health-focused"
+  },
+  {
+    "name": "Princess Tiana",
+    "image_path": "assets/tiana.png",
+    "personality": "Hardworking princess who loves cooking and dreams",
+    "match_keywords": ["tiana", "food", "cooking", "princess", "dreams", "new orleans"],
+    "voice_style": "Encouraging, warm, and food-loving"
+  },
+  {
+    "name": "Mulan",
+    "image_path": "assets/mulan.png",
+    "personality": "Brave warrior with honor and determination",
+    "match_keywords": ["mulan", "warrior", "brave", "honor", "china", "strength", "wisdom"],
+    "voice_style": "Strong, wise, and inspirational"
+  },
+  {
+    "name": "Mickey Mouse",
+    "image_path": "assets/mickey.png",
+    "personality": "Cheerful and optimistic Disney icon",
+    "match_keywords": ["mickey", "disney", "cheerful", "travel", "adventure", "classic"],
+    "voice_style": "Upbeat, cheerful, and magical"
+  },
+  {
+    "name": "Jafar",
+    "image_path": "assets/jafar.png",
+    "personality": "Cunning sorcerer with a flair for the dramatic",
+    "match_keywords": ["jafar", "villain", "game", "magic", "cunning", "dramatic"],
+    "voice_style": "Dramatic, cunning, but playfully villainous"
+  },
+  {
+    "name": "Minnie Mouse",
+    "image_path": "assets/minnie.png",
+    "personality": "Sweet and fashionable Disney icon",
+    "match_keywords": ["minnie", "sweet", "fashion", "jewelry", "cute", "disney"],
+    "voice_style": "Sweet, fashionable, and caring"
+  },
+  {
+    "name": "Elsa",
+    "image_path": "assets/elsa.png",
+    "personality": "Ice queen with powers of transformation",
+    "match_keywords": ["elsa", "ice", "transformation", "magic", "snow", "frozen"],
+    "voice_style": "Regal, magical, and empowering"
+  },
+  {
+    "name": "Olaf",
+    "image_path": "assets/olaf.png",
+    "personality": "Happy snowman who loves warm hugs",
+    "match_keywords": ["olaf", "warm", "hugs", "happy", "summer", "joy"],
+    "voice_style": "Cheerful, innocent, and hug-loving"
+  },
+  {
+    "name": "Genie",
+    "image_path": "assets/genie.png",
+    "personality": "Magical wish-granter with infinite energy",
+    "match_keywords": ["genie", "wishes", "magic", "energy", "blue", "comedian"],
+    "voice_style": "Energetic, magical, and entertaining"
+  },
+  {
+    "name": "Belle",
+    "image_path": "assets/belle.png",
+    "personality": "Book-loving princess with curiosity",
+    "match_keywords": ["belle", "books", "reading", "beauty", "beast", "learning"],
+    "voice_style": "Intelligent, curious, and book-loving"
+  },
+  {
+    "name": "Simba",
+    "image_path": "assets/simba.png",
+    "personality": "Lion king learning about responsibility",
+    "match_keywords": ["simba", "lion", "king", "responsibility", "adventure", "growth"],
+    "voice_style": "Noble, adventurous, and growing"
+  },
+  {
+    "name": "Rapunzel",
+    "image_path": "assets/rapunzel.png",
+    "personality": "Creative princess with long hair and artistic spirit",
+    "match_keywords": ["rapunzel", "art", "creative", "hair", "tower", "painting"],
+    "voice_style": "Artistic, enthusiastic, and creative"
+  },
+  {
+    "name": "Woody",
+    "image_path": "assets/woody.png",
+    "personality": "Loyal cowboy toy and leader",
+    "match_keywords": ["woody", "toy", "cowboy", "loyalty", "friend", "adventure"],
+    "voice_style": "Loyal, friendly, and adventurous"
+  },
+  {
+    "name": "Moana",
+    "image_path": "assets/moana.png",
+    "personality": "Ocean-loving adventurer and voyager",
+    "match_keywords": ["moana", "ocean", "adventure", "voyage", "brave", "island"],
+    "voice_style": "Brave, ocean-loving, and adventurous"
+  },
+  {
+    "name": "Winnie the Pooh",
+    "image_path": "assets/pooh.png",
+    "personality": "Gentle bear who loves honey and relaxation",
+    "match_keywords": ["pooh", "honey", "relaxation", "gentle", "comfort", "peaceful"],
+    "voice_style": "Gentle, peaceful, and comfort-loving"
+  }
+] 

@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>✨ Rafa's Wishes - 30th Birthday Adventure! ✨</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v={{ cache_bust }}">
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One:wght@400&family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="background">
+        <div class="stars"></div>
+        <div class="sparkles"></div>
+    </div>
+    
+    <header class="header">
+        <h1 class="main-title">✨ Rafa's Wishes ✨</h1>
+        <p class="subtitle">🎂 Rafa's Magical 30th Birthday Adventure 🎂</p>
+        <p class="location">Fort Wilderness • Where Dreams Come True</p>
+    </header>
+
+    <main class="main-content">
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="footer">
+        <p>🌐 Remote Access Active | 🎪 Magical Surprises Await</p>
+    </footer>
+
+    <script src="{{ url_for('static', filename='js/app.js') }}?v={{ cache_bust }}"></script>
+    <script src="{{ url_for('static', filename='js/wheel.js') }}?v={{ cache_bust }}"></script>
+    {% block scripts %}{% endblock %}
+</body>
+</html> 
