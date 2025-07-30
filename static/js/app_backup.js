@@ -9,9 +9,11 @@ let gameData = window.gameData || {};
 let currentGift = null;
 let currentCharacter = null;
 
-// Check if gift is every 5th gift (special surprise gifts)
+// Check if gift is special based on specific gift IDs
 function isSpecialGift(giftId) {
-    return giftId % 5 === 0;
+    // Use the exact gift IDs specified by the user
+    const specialGiftIds = [6, 28, 25, 24, 21, 19];
+    return specialGiftIds.includes(giftId);
 }
 
 // Get reveal method for gift (simplified - no more complex animations)
@@ -172,7 +174,7 @@ async function selectGift(giftId) {
     }
     
     // Check if this is a phone call gift (every 5th)
-    if (numericGiftId % 5 === 0) {
+            if (isSpecialGift(numericGiftId)) {
         console.log('📞 Phone call gift detected');
         // Show phone call screen
         showPhoneCallScreen(numericGiftId);

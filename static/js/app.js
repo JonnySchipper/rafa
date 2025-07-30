@@ -417,8 +417,14 @@ function formatGiftNumbers(gifts) {
 function revealGift(giftId) {
     console.log('🎁 Revealing gift:', giftId);
     
-    // Check if this is a special gift (every 5th gift)
-    if (giftId % 5 === 0) {
+            // Check if this is a special gift using specific gift IDs
+        function isSpecialGift(giftId) {
+            // Use the exact gift IDs specified by the user
+            const specialGiftIds = [28, 24, 19];
+            return specialGiftIds.includes(giftId);
+        }
+        
+        if (isSpecialGift(giftId)) {
         console.log('📞 Special gift detected! Triggering phone call...');
         triggerSpecialGiftCall(giftId);
     } else {
@@ -556,8 +562,14 @@ function handleWebhookReveal(reveal) {
     // Stop polling to prevent repeated redirects
     stopWebhookPolling();
     
-    // Check if this is a special gift (every 5th gift: 5, 10, 15, 20, 25, 30)
-    if (reveal.id % 5 === 0) {
+    // Check if this is a special gift using specific gift IDs
+    function isSpecialGiftForWebhook(giftId) {
+        // Use the exact gift IDs specified by the user
+        const specialGiftIds = [6, 28, 25, 24, 21, 19];
+        return specialGiftIds.includes(giftId);
+    }
+    
+    if (isSpecialGiftForWebhook(reveal.id)) {
         console.log(`✨ Special gift #${reveal.id} detected! Showing pixie dust animation...`);
         // Show magical pixie dust animation before revealing the gift for special presents only
         showPixieDustAnimation(() => {

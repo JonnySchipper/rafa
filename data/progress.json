@@ -1,18 +1,13 @@
 {
-  "total_revealed": 2,
-  "last_played": "2025-07-29T08:21:16.364077",
+  "total_revealed": 1,
+  "last_played": "2025-07-30T00:14:24.479803",
   "mode": "random",
-  "current_agent_index": 0,
+  "current_agent_index": 2,
   "revealed_gifts": [
     {
-      "id": 5,
-      "revealed_at": "2025-07-28T22:51:22.096887",
-      "revealed_by": "Princess Tiana"
-    },
-    {
-      "id": 10,
-      "revealed_at": "2025-07-28T22:52:25.454107",
-      "revealed_by": "Mickey Mouse"
+      "id": 30,
+      "revealed_at": "2025-07-30T00:14:24.479803",
+      "revealed_by": "web_interface"
     }
   ]
 }

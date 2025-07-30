@@ -20,27 +20,27 @@
     {% if summary.remaining_gifts > 0 %}
         <div class="gift-selection-section">
             <h2 class="selection-title">🎁 Choose Your Next Magical Gift! 🎁</h2>
-            <p class="selection-subtitle">Each gift has its own unique magical reveal experience!</p>
+
             
 
             
             <div class="gifts-grid">
                 {% for gift in available_gifts %}
-                    <div class="gift-card {% if gift.id % 5 == 0 %}special-gift{% endif %}" data-gift-id="{{ gift.id }}" onclick="revealGift({{ gift.id }})">
+                    <div class="gift-card {% if is_special_gift(gift.id) %}special-gift{% endif %}" data-gift-id="{{ gift.id }}" onclick="revealGift({{ gift.id }})">
                         <div class="gift-icon">
-                            {% if gift.id % 5 == 0 %}
+                            {% if is_special_gift(gift.id) %}
                                 <div class="special-present">🎁</div>
                             {% else %}
                                 🎁
                             {% endif %}
                         </div>
-                                                        <div class="gift-reveal-type">
-                                    {% if gift.id % 5 == 0 %}
-                                        <span class="special-reveal">✨ Surprise Magic ✨</span>
-                                    {% else %}
-                                        <span class="magic-reveal">✨ Magical ✨</span>
-                                    {% endif %}
-                                </div>
+                        <div class="gift-reveal-type">
+                            {% if is_special_gift(gift.id) %}
+                                <span class="special-reveal">✨ Surprise Magic ✨</span>
+                            {% else %}
+                                <span class="magic-reveal">✨ Magical ✨</span>
+                            {% endif %}
+                        </div>
                     </div>
                 {% endfor %}
             </div>
@@ -145,7 +145,7 @@
     <div class="settings-section">
         <h3>🎮 Game Settings:</h3>
         <div class="setting-info">
-            <p>✨ Each gift has a unique magical reveal experience</p>
+
             <p>🎭 Special animated reveals for all gifts</p>
             <p>🎂 Perfect for Rafa's 30th birthday celebration</p>
         </div>
@@ -174,6 +174,7 @@
 window.gameData = {
     summary: {{ summary | tojson | safe }},
     availableGifts: {{ available_gifts | tojson | safe }},
+    allGifts: {{ all_gifts | tojson | safe }},
     session: {{ session_data | tojson | safe }}
 };
 
@@ -183,7 +184,7 @@ window.revealMethods = {
     2: "⭐ Shooting Star",
     3: "🧚‍♀️ Fairy Dust Sprinkle",
     4: "🏰 Castle Door Opening",
-    6: "🔮 Crystal Ball Vision",
+    6: "✨ Magical Reveal",
     7: "🪄 Magic Wand Tap",
     8: "🎆 Fireworks Explosion",
     9: "❄️ Snow Globe Shake",

@@ -15,7 +15,7 @@ const revealMethods = {
     2: "⭐ Shooting Star",
     3: "🧚‍♀️ Fairy Dust Sprinkle",
     4: "🏰 Castle Door Opening",
-    6: "🔮 Crystal Ball Vision",
+    6: "✨ Magical Reveal",
     7: "🪄 Magic Wand Tap",
     8: "🎆 Fireworks Explosion",
     9: "❄️ Snow Globe Shake",
@@ -134,8 +134,14 @@ async function selectGift(giftId) {
         return;
     }
     
-    // Check if this is a phone call gift (every 5th)
-    if (giftId % 5 === 0) {
+    // Check if this is a phone call gift using specific gift IDs
+    function isSpecialGift(giftId) {
+        // Use the exact gift IDs specified by the user
+        const specialGiftIds = [28, 24, 19];
+        return specialGiftIds.includes(giftId);
+    }
+    
+    if (isSpecialGift(giftId)) {
         // Show phone call screen
         showPhoneCallScreen(giftId);
         return;
@@ -225,13 +231,13 @@ function createAnimationForGift(giftId) {
             return createFairyDustAnimation(container);
         case 4: // Castle Door
             return createCastleDoorAnimation(container);
-        case 6: // Crystal Ball
-            return createCrystalBallAnimation(container);
+        case 6: // Regular gift now
+            return createDefaultMagicAnimation(container, revealMethod);
         case 7: // Magic Wand
             return createMagicWandAnimation(container);
         case 8: // Fireworks
             return createFireworksAnimation(container);
-        case 9: // Snow Globe
+        case 9: // Snow Globe (regular gift now)
             return createSnowGlobeAnimation(container);
         // Add more cases for other gifts...
         default:

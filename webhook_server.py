@@ -16,6 +16,16 @@ from typing import Optional, Dict, Any
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+def is_special_gift_by_position(position):
+    """Check if a gift is special based on its position (1-indexed)."""
+    return position % 5 == 0
+
+def is_special_gift(gift_id, gifts_list=None):
+    """Check if a gift is special based on the specified gift IDs."""
+    # Use the exact gift IDs specified by the user
+    SPECIAL_GIFT_IDS = {28, 24, 19}
+    return gift_id in SPECIAL_GIFT_IDS
+
 class WebhookServer:
     """Flask webhook server for remote gift reveals."""
     
@@ -58,6 +68,7 @@ class WebhookServer:
             # Get available gifts for display
             available_gifts = self.game_logic.get_available_gifts()
             revealed_gifts = self.game_logic.get_revealed_gifts()
+            all_gifts = self.game_logic.gifts  # Full ordered list for position calculation
             total_gifts = len(self.game_logic.gifts)
             
             # Create summary data that the template expects
@@ -75,14 +86,21 @@ class WebhookServer:
                 'mode': self.game_logic.session.mode
             }
             
+            # Add special gift information to the template context
+            def is_special_gift_for_template(gift_id):
+                SPECIAL_GIFT_IDS = {28, 24, 19}
+                return gift_id in SPECIAL_GIFT_IDS
+            
             cache_bust = str(int(time.time()))
             return render_template('index.html',
                                  summary=summary,
                                  available_gifts=available_gifts,
                                  revealed_gifts=revealed_gifts,
+                                 all_gifts=all_gifts,
                                  total_gifts=total_gifts,
                                  session_data=session_data,
-                                 cache_bust=cache_bust)
+                                 cache_bust=cache_bust,
+                                 is_special_gift=is_special_gift_for_template)
         
         @self.app.route('/gift_reveal', methods=['GET'])
         def gift_reveal():
@@ -179,7 +197,7 @@ class WebhookServer:
                 success = self.game_logic.reveal_gift(gift, character)
                 
                 if success:
-                    reveal_type = 'special_gift' if present_id % 5 == 0 else 'regular_gift'
+                    reveal_type = 'special_gift' if is_special_gift(present_id, self.game_logic.gifts if self.game_logic else None) else 'regular_gift'
                     
                     return jsonify({
                         'success': True,
@@ -188,7 +206,7 @@ class WebhookServer:
                         'status': 'revealed',
                         'revealed_by': character.name,
                         'reveal_type': reveal_type,
-                        'is_special_gift': present_id % 5 == 0,
+                        'is_special_gift': is_special_gift(present_id, self.game_logic.gifts if self.game_logic else None),
                         'gift_description': gift.description
                     })
                 else:
@@ -209,8 +227,8 @@ class WebhookServer:
                 if not available_gifts:
                     return jsonify({'error': 'No gifts available to reveal'}), 404
                 
-                # Find the next unrevealed special gift (every 5th gift)
-                special_gift_ids = [5, 10, 15, 20, 25, 30]
+                # Find the next unrevealed special gift
+                special_gift_ids = [28, 24, 19]
                 next_special_gift = None
                 
                 for special_id in special_gift_ids:
@@ -239,7 +257,7 @@ class WebhookServer:
                         'present_id': next_special_gift.id,
                         'status': 'revealed',
                         'revealed_by': character.name,
-                        'is_special_gift': next_special_gift.id % 5 == 0,
+                        'is_special_gift': is_special_gift(next_special_gift.id, self.game_logic.gifts if self.game_logic else None),
                         'gift_description': next_special_gift.description
                     })
                 else:
@@ -259,8 +277,9 @@ class WebhookServer:
             try:
                 summary = self.game_logic.get_game_summary()
                 available_gifts = self.game_logic.get_available_gifts()
+                all_gifts = self.game_logic.gifts  # Full ordered list
                 
-                # Convert gifts to dictionaries
+                # Convert available gifts to dictionaries
                 available_gifts_data = []
                 for gift in available_gifts:
                     gift_data = {
@@ -274,10 +293,25 @@ class WebhookServer:
                     }
                     available_gifts_data.append(gift_data)
                 
+                # Convert all gifts to dictionaries
+                all_gifts_data = []
+                for gift in all_gifts:
+                    gift_data = {
+                        'id': gift.id,
+                        'description': gift.description,
+                        'themes': gift.themes,
+                        'image_path': gift.image_path,
+                        'revealed': gift.revealed,
+                        'revealed_at': gift.revealed_at,
+                        'revealed_by': gift.revealed_by
+                    }
+                    all_gifts_data.append(gift_data)
+                
                 return jsonify({
                     'success': True,
                     'summary': summary,
-                    'available_gifts': available_gifts_data
+                    'available_gifts': available_gifts_data,
+                    'all_gifts': all_gifts_data
                 })
             except Exception as e:
                 logger.error(f"Error getting game status: {e}")
@@ -544,7 +578,7 @@ class WebhookServer:
                                     'description': gift.description,
                                     'revealed_at': gift.revealed_at,
                                     'revealed_by': getattr(gift, 'revealed_by', 'unknown'),
-                                    'is_special_gift': gift.id % 5 == 0
+                                    'is_special_gift': is_special_gift(gift.id, self.game_logic.gifts if self.game_logic else None)
                                 })
                         except:
                             # Skip if time parsing fails

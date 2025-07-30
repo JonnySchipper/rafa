@@ -14,6 +14,16 @@ import logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+def is_special_gift_by_position(position):
+    """Check if a gift is special based on its position (1-indexed)."""
+    return position % 5 == 0
+
+def is_special_gift(gift_id, gifts_list=None):
+    """Check if a gift is special based on the specified gift IDs."""
+    # Use the exact gift IDs specified by the user
+    SPECIAL_GIFT_IDS = {28, 24, 19}
+    return gift_id in SPECIAL_GIFT_IDS
+
 class GrokAPIClient:
     """Client for interacting with xAI's Grok API."""
     
@@ -197,18 +207,24 @@ class VapiClient:
             "Content-Type": "application/json"
         }
         
-        # Multiple agent/phone configurations for cycling
+        # Multiple agent/phone configurations with direct gift mapping
         self.agent_configs = [
             {
-                "name": "Agent 1",
+                "name": "Agent 1 (Gift #28)",
                 "assistant_id": "b4f5f908-8c08-4c28-b4f7-37a9a43f2833",
                 "phone_number_id": "958dd8c2-00f9-4b28-a0ae-e2de7fa64254",
                 "phone_number": "Current Phone"  # Original phone number
             },
             {
-                "name": "Agent 2", 
+                "name": "Agent 2 (Gift #24)", 
                 "assistant_id": "faa5e904-9d4c-4472-a58c-434c1ff34ee7",
                 "phone_number_id": "2fafd93d-48c2-4b34-b365-ae9884310767",  # +1 (448) 228 6708
+                "phone_number": "+1 (448) 228 6708"
+            },
+            {
+                "name": "Agent 3 (Gift #19)",
+                "assistant_id": "d2c62d11-502e-4bcd-988c-60a1fe27106e",
+                "phone_number_id": "96813731-822d-4fc6-b62e-56094d536869",
                 "phone_number": "+1 (448) 228 6708"
             }
         ]
@@ -216,7 +232,7 @@ class VapiClient:
         # Rafa's phone number (destination/TO number) - always the same
         self.rafa_phone = "+18633320003"
         
-        # Current agent index for cycling (will be loaded from progress)
+        # Current agent index (kept for compatibility, but no longer used for cycling)
         self.current_agent_index = 0
         
     def _is_valid_uuid(self, uuid_string: str) -> bool:
@@ -249,7 +265,7 @@ class VapiClient:
     
     def create_call(self, present_id: Optional[int] = None, custom_message: Optional[str] = None) -> Dict:
         """
-        Create an outbound call using Vapi API with agent cycling for special presents.
+        Create an outbound call using Vapi API with direct agent mapping for special presents.
         
         Args:
             present_id: Optional gift ID to include in metadata
@@ -260,10 +276,21 @@ class VapiClient:
         """
 
         try:
-            # Get next agent configuration for cycling
-            agent_config = self.get_next_agent_config()
+            # Direct mapping of gift IDs to specific agents
+            if present_id == 28:
+                agent_config = self.agent_configs[0]  # Agent 1 for Gift #28
+            elif present_id == 24:
+                agent_config = self.agent_configs[1]  # Agent 2 for Gift #24
+            elif present_id == 19:
+                agent_config = self.agent_configs[2]  # Agent 3 for Gift #19
+            else:
+                # Fallback to Agent 1 for any other gifts or general calls
+                agent_config = self.agent_configs[0]
             
-            logger.info(f"Using agent configuration: {agent_config['name']} with phone {agent_config['phone_number']}")
+            if present_id:
+                logger.info(f"Using agent configuration: {agent_config['name']} for Gift #{present_id} with phone {agent_config['phone_number']}")
+            else:
+                logger.info(f"Using agent configuration: {agent_config['name']} for general call with phone {agent_config['phone_number']}")
             
             # Check if assistant ID is properly configured
             if not agent_config["assistant_id"]:
@@ -301,7 +328,7 @@ class VapiClient:
             if present_id:
                 call_data["metadata"]["present_id"] = present_id
                 call_data["metadata"]["gift_reveal"] = True
-                call_data["metadata"]["is_special_gift"] = present_id % 5 == 0 if present_id else False
+                call_data["metadata"]["is_special_gift"] = is_special_gift(present_id) if present_id else False
                 
             if custom_message:
                 call_data["metadata"]["custom_message"] = custom_message

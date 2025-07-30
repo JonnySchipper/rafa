@@ -21,6 +21,19 @@ from api_integration import grok_client, vapi_client
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+def is_special_gift_by_position(position):
+    """Check if a gift is special based on its position (1-indexed)."""
+    return position % 5 == 0
+
+def is_special_gift(gift_id, gifts_list=None):
+    """Check if a gift is special based on the specified gift IDs."""
+    # Use the exact gift IDs specified by the user
+    SPECIAL_GIFT_IDS = {28, 24, 19}
+    is_special = gift_id in SPECIAL_GIFT_IDS
+    if is_special:
+        logger.info(f"Special gift identified: Gift #{gift_id}")
+    return is_special
+
 class SpinningWheel:
     """Animated spinning wheel for gift selection."""
     
@@ -40,7 +53,7 @@ class SpinningWheel:
             "#CD853F", "#5F9EA0", "#7B68EE", "#A0522D", "#808000", "#483D8B"
         ]
         
-    def create_segments(self, items):
+    def create_segments(self, items, full_gifts_list=None):
         """Create wheel segments for items."""
         self.segments = []
         if not items:
@@ -49,10 +62,15 @@ class SpinningWheel:
         segment_angle = 360 / len(items)
         for i, item in enumerate(items):
             start_angle = i * segment_angle
-            gift_id = item.id if hasattr(item, 'id') else int(item.split('#')[1]) if '#' in str(item) else i+1
+            # Always use the actual gift ID from the item object
+            gift_id = item.id if hasattr(item, 'id') else None
             
-            # Check if this is every 5th gift (special surprise gifts)
-            is_special = gift_id % 5 == 0
+            # Check if this is a special surprise gift based on the gift ID
+            is_special = is_special_gift(gift_id, full_gifts_list) if gift_id is not None else False
+            
+            # Debug logging for special gifts
+            if is_special:
+                logger.info(f"Creating special segment for Gift #{gift_id}")
             
             # Use gold colors for special gifts, regular colors for others
             if is_special:
@@ -513,7 +531,7 @@ class DisneyWishOracleApp:
         self.spinning_wheel = SpinningWheel(self.wheel_canvas, center_x, center_y, wheel_radius)
         
         # Use ALL available gifts for the wheel
-        self.spinning_wheel.create_segments(available_gifts)
+        self.spinning_wheel.create_segments(available_gifts, self.game_logic.gifts)
         self.spinning_wheel.draw()
         
         # Show gift count info - bigger text
@@ -587,8 +605,8 @@ class DisneyWishOracleApp:
             self.show_welcome_screen()
             return
             
-        # Check if this is every 5th gift (special phone call gift)
-        if self.current_gift.id % 5 == 0:
+        # Check if this is a special phone call gift
+        if is_special_gift(self.current_gift.id, self.game_logic.gifts):
             # Show phone call screen for special gifts
             self.root.after(1500, self.show_phone_call_screen)
         else:

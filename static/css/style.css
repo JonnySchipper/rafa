@@ -943,15 +943,18 @@ body {
     color: #FFD700;
     font-weight: bold;
     background: rgba(255, 215, 0, 0.2);
-    padding: 0.4rem 1rem;
+    padding: 0.4rem 0.8rem;
     border-radius: 15px;
     border: 1px solid rgba(255, 215, 0, 0.7);
     text-shadow: 0 0 10px rgba(255, 215, 0, 0.6);
     animation: specialTextGlow 1.5s ease-in-out infinite alternate;
-    font-size: 0.85rem;
+    font-size: 0.75rem;
     white-space: nowrap;
     text-align: center;
-    min-width: 80px;
+    min-width: 130px;
+    max-width: 150px;
+    display: inline-block;
+    line-height: 1.2;
 }
 
 @keyframes specialTextGlow {
@@ -963,13 +966,18 @@ body {
     color: #FF69B4;
     font-weight: bold;
     background: rgba(255, 105, 180, 0.2);
-    padding: 0.4rem 1rem;
+    padding: 0.4rem 0.8rem;
     border-radius: 15px;
     border: 1px solid rgba(255, 105, 180, 0.5);
-    font-size: 0.85rem;
+    font-size: 0.8rem;
     white-space: nowrap;
     text-align: center;
-    min-width: 80px;
+    min-width: 100px;
+    max-width: 120px;
+    display: inline-block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.2;
 }
 
 
